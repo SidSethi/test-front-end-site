@@ -21,7 +21,7 @@ outputs:
     value: ${{ steps.urls.outputs.bundle }}
   checksum:
     description: Integrity checksum of the bundle
-    value: ${{ steps.checksum.outputs.hash }}
+    value: ${{ steps.checksum.outputs.checksum }}
 
 runs:
   using: composite
@@ -37,7 +37,7 @@ runs:
         echo "release_name=$release_name" >> $GITHUB_ENV
       shell: bash
 
-    - name: Create bundle
+    - name: Create bundle file
       id: bundle
       run: |
         filename="$(npx earthfast-cli bundle create ${{ inputs.bundle_name }} ${{ inputs.build_dir }})"
@@ -47,20 +47,35 @@ runs:
     - name: Create checksum file
       id: checksum
       run: |
-        checksum="$(npx earthfast-cli bundle checksum ${{ steps.bundle.outputs.filename }})"
+        # Retrieve the filename from the previous step
+        filename="${{ steps.bundle.outputs.filename }}"
+        if [ -z "$filename" ]; then
+          echo "Error: Bundle filename is empty."
+          exit 1
+        fi
+
+        # Generate checksum
+        checksum="$(npx earthfast-cli bundle checksum "$filename")"
+        if [ $? -ne 0 ]; then
+          echo "Error: Failed to generate checksum."
+          exit 1
+        fi
+
+        # Write checksum to GITHUB_OUTPUT
         echo "checksum=$checksum" >> $GITHUB_OUTPUT
 
-        filename="${{ steps.bundle.outputs.filename }}_SHA256SUM"
-        echo "$checksum" > $filename
-        echo "filename=$filename" >> $GITHUB_OUTPUT
+        # Create checksum file
+        checksum_filename="${filename}_SHA256SUM"
+        echo "$checksum" > "$checksum_filename"
+        echo "filename=$checksum_filename" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Upload bundle and checksum to the release
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        gh release upload "${{ env.release_name }}" ${{ steps.bundle.outputs.filename }}
-        gh release upload "${{ env.release_name }}" ${{ steps.checksum.outputs.filename }}
+        gh release upload "${{ env.release_name }}" "${{ steps.bundle.outputs.filename }}"
+        gh release upload "${{ env.release_name }}" "${{ steps.checksum.outputs.filename }}"
       shell: bash
 
     - name: Retrieve URLs
