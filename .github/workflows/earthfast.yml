@@ -23,7 +23,7 @@ jobs:
           npm run build
 
       - name: Bundle release for EarthFast
-        uses: ./earthfast-release-action
+        uses: ./.github/earthfast-release-action
         id: earthfast
         with:
           build_dir: out
