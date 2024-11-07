@@ -23,7 +23,7 @@ jobs:
           npm run build
 
       - name: Bundle release for EarthFast
-        uses: earthfast/earthfast-release-action@v2.0.0-alpha
+        uses: ./actions/earthfast-release-action
         id: earthfast
         with:
           build_dir: out
@@ -33,4 +33,4 @@ jobs:
       - name: Log the EarthFast bundle data
         run: |
           echo "EarthFast bundle url: ${{ steps.earthfast.outputs.bundle_url }}"
-          echo "EarthFast bundle checksum: ${{ steps.earthfast.outputs.checksum }}"
+          echo "EarthFast bundle checksum: ${{ steps.earthfast.outputs.checksum }}" 
