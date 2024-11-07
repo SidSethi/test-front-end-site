@@ -26,7 +26,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Determine Release Name
+    - name: Set release name from input or fallback to ref name
       id: determine_release_name
       run: |
         if [ -z "${{ inputs.release_name }}" ]; then
