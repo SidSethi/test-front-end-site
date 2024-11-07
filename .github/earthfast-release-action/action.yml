@@ -23,14 +23,14 @@ runs:
     - name: Create bundle
       id: bundle
       run: |
-        filename="$(npx earthfast-cli --yes bundle create ${{ inputs.bundle_name }} ${{ inputs.build_dir }})"
+        filename="$(npx earthfast-cli bundle create ${{ inputs.bundle_name }} ${{ inputs.build_dir }})"
         echo "filename=$filename" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Create checksum file
       id: checksum
       run: |
-        checksum="$(npx earthfast-cli --yes bundle checksum ${{ steps.bundle.outputs.filename }})"
+        checksum="$(npx earthfast-cli bundle checksum ${{ steps.bundle.outputs.filename }})"
         echo "checksum=$checksum" >> $GITHUB_OUTPUT
 
         filename="${{ steps.bundle.outputs.filename }}_SHA256SUM"
