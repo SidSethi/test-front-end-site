@@ -26,9 +26,9 @@ jobs:
         id: determine_release
         run: |
           if [ "${{ github.event_name }}" == "release" ]; then
-            echo "release_name=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+            echo "release_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
           else
-            echo "release_name=${{ github.ref_name }}-sid-test-${{ github.sha }}" >> $GITHUB_ENV
+            echo "release_name=${{ github.ref_name }}-sid-test-${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Release if Needed
