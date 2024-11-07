@@ -1,5 +1,6 @@
 name: EarthFast Release
 description: Create an EarthFast bundle and upload it as a release asset.
+
 inputs:
   build_dir:
     description: Project build directory
@@ -13,6 +14,7 @@ inputs:
   release_name:
     description: Name of the release
     required: true
+
 outputs:
   bundle_url:
     description: Download URL for the bundle
@@ -20,6 +22,7 @@ outputs:
   checksum:
     description: Integrity checksum of the bundle
     value: ${{ steps.checksum.outputs.hash }}
+
 runs:
   using: composite
   steps:
