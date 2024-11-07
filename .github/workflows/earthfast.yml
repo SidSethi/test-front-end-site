@@ -22,6 +22,24 @@ jobs:
           npm install
           npm run build
 
+      - name: Determine Release Name
+        id: determine_release
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            echo "release_name=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "release_name=${{ github.ref_name }}-sid-test-${{ github.sha }}" >> $GITHUB_ENV
+          fi
+
+      - name: Create Release if Needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          release_name="${{ steps.determine_release.outputs.release_name }}"
+          if ! gh release view "$release_name"; then
+            gh release create "$release_name" -t "$release_name" -n "Release for $release_name"
+          fi
+
       - name: Bundle release for EarthFast
         uses: ./.github/earthfast-release-action
         id: earthfast
@@ -29,8 +47,9 @@ jobs:
           build_dir: out
           bundle_name: sid-test-${{ github.ref_name }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: ${{ steps.determine_release.outputs.release_name }}
 
       - name: Log the EarthFast bundle data
         run: |
           echo "EarthFast bundle url: ${{ steps.earthfast.outputs.bundle_url }}"
-          echo "EarthFast bundle checksum: ${{ steps.earthfast.outputs.checksum }}" 
+          echo "EarthFast bundle checksum: ${{ steps.earthfast.outputs.checksum }}"

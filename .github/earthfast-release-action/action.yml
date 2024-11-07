@@ -10,6 +10,9 @@ inputs:
   github_token:
     description: Auth token for the GitHub CLI
     required: true
+  release_name:
+    description: Name of the release
+    required: true
 outputs:
   bundle_url:
     description: Download URL for the bundle
@@ -42,8 +45,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        gh release upload ${{ github.ref_name }} ${{ steps.bundle.outputs.filename }}
-        gh release upload ${{ github.ref_name }} ${{ steps.checksum.outputs.filename }}
+        gh release upload ${{ inputs.release_name }} ${{ steps.bundle.outputs.filename }}
+        gh release upload ${{ inputs.release_name }} ${{ steps.checksum.outputs.filename }}
       shell: bash
 
     - name: Retrieve URLs
@@ -51,6 +54,6 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        bundle="$(gh release view ${{ github.ref_name }} --json assets --jq '.assets[] | select(.name == "${{ steps.bundle.outputs.filename }}") | .url')"
+        bundle="$(gh release view ${{ inputs.release_name }} --json assets --jq '.assets[] | select(.name == "${{ steps.bundle.outputs.filename }}") | .url')"
         echo "bundle=$bundle" >> $GITHUB_OUTPUT
       shell: bash
