@@ -1,0 +1,30 @@
+name: EarthFast Release
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build application
+        run: |
+          npm install
+          npm run build
+
+      - name: Bundle release for EarthFast
+        uses: earthfast/earthfast-release-action@v2.0.0-alpha
+        id: earthfast
+        with:
+          build_dir: out
+          bundle_name: sid-test-${{ github.ref_name }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log the EarthFast bundle data
+        run: |
+          echo "EarthFast bundle url: ${{ steps.earthfast.outputs.bundle_url }}"
+          echo "EarthFast bundle checksum: ${{ steps.earthfast.outputs.checksum }}"
