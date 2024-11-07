@@ -13,7 +13,7 @@ inputs:
     required: true
   release_name:
     description: Name of the release
-    required: true
+    required: false
 
 outputs:
   bundle_url:
@@ -26,6 +26,17 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Determine Release Name
+      id: determine_release_name
+      run: |
+        if [ -z "${{ inputs.release_name }}" ]; then
+          release_name="${{ github.ref_name }}"
+        else
+          release_name="${{ inputs.release_name }}"
+        fi
+        echo "release_name=$release_name" >> $GITHUB_ENV
+      shell: bash
+
     - name: Create bundle
       id: bundle
       run: |
@@ -48,8 +59,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        gh release upload ${{ inputs.release_name }} ${{ steps.bundle.outputs.filename }}
-        gh release upload ${{ inputs.release_name }} ${{ steps.checksum.outputs.filename }}
+        gh release upload "${{ env.release_name }}" ${{ steps.bundle.outputs.filename }}
+        gh release upload "${{ env.release_name }}" ${{ steps.checksum.outputs.filename }}
       shell: bash
 
     - name: Retrieve URLs
@@ -57,6 +68,6 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        bundle="$(gh release view ${{ inputs.release_name }} --json assets --jq '.assets[] | select(.name == "${{ steps.bundle.outputs.filename }}") | .url')"
+        bundle="$(gh release view "${{ env.release_name }}" --json assets --jq '.assets[] | select(.name == "${{ steps.bundle.outputs.filename }}") | .url')"
         echo "bundle=$bundle" >> $GITHUB_OUTPUT
       shell: bash

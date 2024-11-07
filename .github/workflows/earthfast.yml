@@ -31,7 +31,8 @@ jobs:
           if [ "${{ github.event_name }}" == "release" ]; then
             echo "release_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
           else
-            echo "release_name=${{ github.ref_name }}-sid-test-${{ github.sha }}" >> $GITHUB_OUTPUT
+            timestamp=$(date +%Y%m%d%H%M%S)
+            echo "release_name=${{ github.ref_name }}-manual-${timestamp}" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Release if Needed
