@@ -31,7 +31,7 @@ jobs:
           if [ "${{ github.event_name }}" == "release" ]; then
             echo "release_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
           else
-            timestamp=$(date +%Y%m%d%H%M%S)
+            timestamp=$(date +%Y_%m_%d_%H_%M_%S)
             echo "release_name=${{ github.ref_name }}-manual-${timestamp}" >> $GITHUB_OUTPUT
           fi
 

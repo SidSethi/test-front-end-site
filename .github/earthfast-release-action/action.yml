@@ -77,7 +77,7 @@ runs:
         gh release upload "${{ env.release_name }}" "${{ steps.bundle.outputs.filename }}"
         gh release upload "${{ env.release_name }}" "${{ steps.checksum.outputs.filename }}"
         # Update release notes with the checksum
-        gh release edit "${{ env.release_name }}" --notes "$(gh release view "${{ env.release_name }}" --json body --jq '.body')\nChecksum: $(cat "${{ steps.checksum.outputs.checksum }}")"
+        gh release edit "${{ env.release_name }}" --notes "$(gh release view "${{ env.release_name }}" --json body --jq '.body')\nChecksum: ${{ steps.checksum.outputs.checksum }}"
       shell: bash
 
     - name: Retrieve URLs
